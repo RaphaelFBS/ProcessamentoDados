@@ -1,0 +1,44 @@
+import subprocess
+import json
+import requests
+
+# 1. Obter recomendações do Azure Advisor via Azure CLI
+def get_azure_advisor_recommendations():
+    result = subprocess.run(['az', 'advisor', 'recommendation', 'list', '--output', 'json'], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception("Erro ao obter recomendações do Azure Advisor")
+    return json.loads(result.stdout)
+
+# 2. Filtrar recomendações por categoria (exemplo: custo)
+def filtrar_recomendacoes(recomendacoes, categoria="Cost"):
+    return [r for r in recomendacoes if r["category"] == categoria]
+
+# 3. Criar um work item no Azure DevOps
+def criar_work_item(titulo, descricao, projeto, organizacao, token):
+    url = f"https://dev.azure.com/{organizacao}/{projeto}/_apis/wit/workitems/$Task?api-version=7.0"
+    headers = {
+        "Content-Type": "application/json-patch+json",
+        "Authorization": f"Basic {token}"
+    }
+    payload = [
+        {"op": "add", "path": "/fields/System.Title", "value": titulo},
+        {"op": "add", "path": "/fields/System.Description", "value": descricao}
+    ]
+    response = requests.post(url, headers=headers, json=payload)
+    return response.status_code, response.json()
+
+# 4. Fluxo principal
+recomendacoes = get_azure_advisor_recommendations()
+filtradas = filtrar_recomendacoes(recomendacoes)
+
+# Dados do DevOps (substitua com seus valores)
+projeto = "SeuProjeto"
+organizacao = "SuaOrganizacao"
+token_pat = "BASE64(PAT:)"  # PAT convertido em Base64 (ex: base64encode(':seu_pat'))
+
+for rec in filtradas:
+    titulo = f"[Advisor] {rec['shortDescription']['problem']}"
+    descricao = rec['shortDescription']['solution']
+    status, resposta = criar_work_item(titulo, descricao, projeto, organizacao, token_pat)
+    print(f"Status: {status} | ID: {resposta.get('id', '?')}")
+
