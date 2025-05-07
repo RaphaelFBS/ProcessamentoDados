@@ -1,0 +1,15 @@
+[
+  {
+    "id": "/subscriptions/xxxx/providers/Microsoft.Advisor/recommendations/yyyy",
+    "category": "Cost",
+    "impact": "High",
+    "shortDescription": {
+      "problem": "Unused virtual machine",
+      "solution": "Shut down or resize this VM"
+    },
+    "resourceMetadata": {
+      "resourceId": "/subscriptions/xxx/resourceGroups/yyy/providers/Microsoft.Compute/virtualMachines/vm123"
+    }
+  },
+  ...
+]
