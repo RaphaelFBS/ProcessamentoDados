@@ -1,0 +1,9 @@
+Agendador (Azure Function Timer / Cron local / Azure Automation)
+        ↓
+Script Python
+        ↓
+Chamada REST → Azure Advisor
+        ↓
+Processa dados
+        ↓
+Cria Work Items no Azure DevOps
