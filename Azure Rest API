@@ -1,0 +1,6 @@
+#endpoint
+GET https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.Advisor/recommendations?api-version=2023-01-01
+
+#header
+Authorization: Bearer <token_de_acesso>
+Content-Type: application/json
