@@ -1,0 +1,42 @@
+import base64
+
+# Config DevOps
+ORG = "minhaempresa"
+PROJECT = "FinOps"
+PAT = "<seu_personal_access_token>"
+WORK_ITEM_TYPE = "Issue"  # ou "Task", "User Story" etc.
+
+# Auth header
+pat_token = base64.b64encode(f":{PAT}".encode()).decode()
+devops_headers = {
+    "Authorization": f"Basic {pat_token}",
+    "Content-Type": "application/json-patch+json"
+}
+
+# Loop nas recomendações processadas
+for rec in processed:
+    title = f"[Advisor] {rec['problem']}"
+    description = f"""
+**Categoria:** {rec['category']}
+**Impacto:** {rec['impact']}
+**Recurso:** {rec['resourceId']}
+
+**Solução sugerida:** {rec['solution']}
+
+[🔗 Ver recomendação no Azure Portal](https://portal.azure.com/#blade/Microsoft_Azure_Advisor/RecommendationsBlade/recommendationId/{rec['recommendationId']})
+    """
+
+    url = f"https://dev.azure.com/{ORG}/{PROJECT}/_apis/wit/workitems/${WORK_ITEM_TYPE}?api-version=7.0"
+
+    payload = [
+        { "op": "add", "path": "/fields/System.Title", "value": title },
+        { "op": "add", "path": "/fields/System.Description", "value": description },
+        { "op": "add", "path": "/fields/System.Tags", "value": "AzureAdvisor;FinOps" }
+    ]
+
+    response = requests.post(url, headers=devops_headers, json=payload)
+
+    if response.status_code == 200 or response.status_code == 201:
+        print(f"✅ Work Item criado com sucesso: {response.json()['id']}")
+    else:
+        print(f"❌ Erro ao criar Work Item: {response.status_code} - {response.text}")
