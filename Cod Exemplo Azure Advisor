@@ -1,0 +1,47 @@
+import requests
+import json
+from msal import ConfidentialClientApplication
+
+# Dados do Service Principal
+TENANT_ID = "<seu-tenant-id>"
+CLIENT_ID = "<seu-client-id>"
+CLIENT_SECRET = "<seu-client-secret>"
+SUBSCRIPTION_ID = "<sua-subscription-id>"
+
+# Obter token com MSAL
+authority = f"https://login.microsoftonline.com/{TENANT_ID}"
+app = ConfidentialClientApplication(
+    CLIENT_ID,
+    authority=authority,
+    client_credential=CLIENT_SECRET
+)
+
+token_result = app.acquire_token_for_client(scopes=["https://management.azure.com/.default"])
+access_token = token_result["access_token"]
+
+# Fazer chamada à API do Azure Advisor
+url = f"https://management.azure.com/subscriptions/{SUBSCRIPTION_ID}/providers/Microsoft.Advisor/recommendations?api-version=2023-01-01"
+
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+
+response = requests.get(url, headers=headers)
+recommendations = response.json().get("value", [])
+
+# Processar dados
+processed = []
+for item in recommendations:
+    if item["category"] == "Cost":  # filtro opcional
+        processed.append({
+            "recommendationId": item["id"],
+            "category": item["category"],
+            "impact": item["impact"],
+            "problem": item["shortDescription"]["problem"],
+            "solution": item["shortDescription"]["solution"],
+            "resourceId": item["resourceMetadata"]["resourceId"]
+        })
+
+# Exemplo de uso posterior
+print(json.dumps(processed, indent=2))
