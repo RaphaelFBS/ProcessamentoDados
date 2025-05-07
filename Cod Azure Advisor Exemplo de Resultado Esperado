@@ -1,0 +1,10 @@
+[
+  {
+    "recommendationId": "/subscriptions/xxx/providers/Microsoft.Advisor/recommendations/abc123",
+    "category": "Cost",
+    "impact": "High",
+    "problem": "VM não utilizada",
+    "solution": "Desligar ou redimensionar",
+    "resourceId": "/subscriptions/xxx/resourceGroups/rg/providers/Microsoft.Compute/virtualMachines/vm1"
+  }
+]
