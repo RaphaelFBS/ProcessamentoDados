@@ -1,0 +1,15 @@
+{
+  "value": [
+    {
+      "category": "Cost",
+      "impact": "High",
+      "shortDescription": {
+        "problem": "Unused VM",
+        "solution": "Resize or shut it down"
+      },
+      "resourceMetadata": {
+        "resourceId": "/subscriptions/xxx/resourceGroups/rg/providers/Microsoft.Compute/virtualMachines/vm1"
+      }
+    }
+  ]
+}
